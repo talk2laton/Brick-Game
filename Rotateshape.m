@@ -1,29 +1,27 @@
 function Rotateshape(Parts)
-global PartStack
+global PartStack Rotationbalance
 M    = [0,-1
         1, 0];
-SumV = 0;
+XY = zeros(2, numel(Parts));
 for n = 1:numel(Parts)
-    V = Parts{n}.Vertices;
-    SumV = SumV + sum(V);
+    XY(:, n) = [sum(Parts{n}.XData)/2;sum(Parts{n}.YData)/2];
 end
-Centroid = floor(SumV/(4*n));
-Verts = [];
-for n = 1:numel(Parts)
-    V = (Parts{n}.Vertices - ones(4,1)*Centroid)*M + ones(4,1)*Centroid;
-    Verts = [Verts,V];
-    vmean    = ceil(mean(V));
-    vmean(2) = min(25,vmean(2));
-    if(vmean(1)>10 || vmean(1) < 1)
-        return;
-    end
-    if(vmean(2) < 1)
-        return;
-    end
-    if(~isempty(PartStack{vmean(2), vmean(1)}))
-        return;
-    end
+Centroid = mean(XY,2)*ones(1, numel(Parts));
+XY = M*(XY - Centroid) + Centroid;
+if(mod(Rotationbalance, 2) == 0)
+    XY = floor(XY);
+else
+    XY = ceil(XY);
+end
+
+if(any(XY(1,:) < 1) || any(XY(1,:) > 10))
+    return;
+end
+if(any(XY(2,:) < 1))
+    return;
 end
 for n = 1:numel(Parts)
-    Parts{n}.Vertices = Verts(:,[2*n-1,2*n]);
+    Parts{n}.XData = [-0.5,0.5] + XY(1, n);
+    Parts{n}.YData = [-0.5,0.5] + XY(2, n);
 end
+Rotationbalance = Rotationbalance + 1;

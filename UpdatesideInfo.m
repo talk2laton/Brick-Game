@@ -1,6 +1,6 @@
-function [Parts, txt1, txt2] = UpdatesideInfo(Parts, txt1, txt2, type, c, speed, flp, score)
+function [Parts, txt1, txt2] = UpdatesideInfo(Parts, txt1, txt2, type, clr, speed, flp, score)
 
-point = [0.5,4];
+point = [3;6];
 Shift  = [1, 0, 1, 0, 1, 0, 1, 0, 1, 0
           2, 0, 2, 0, 2, 0, 2, 0, 2, 0
           2,-1, 3, 0, 3, 0, 2,-1, 1,-1
@@ -16,26 +16,21 @@ switch type
    case 'T'
        index = [7,8]; 
 end
+M = eye(2);
 if(flp)
-    M = [-1,0
-         0, 1];
-    Points = ones(4,1)*(point + [4, -2]);
-    Points = Points - Shift(:,index)*M;
-else
-    Points = ones(4,1)*point;
-    Points = Points + Shift(:,index);
+    M = [-1,0; 0, 1]; 
 end
-p   = floor(sum(Points)/4);
-del = p - [3,4];
-Points = Points - ones(4,1)*del;
-
+Points = point*ones(1,4) + M * Shift(:,index)';
+del = point - mean(Points, 2);
+XY = Points + del*ones(1,4);
+img = flipud(imread(clr));
 if(ishandle(txt1))
      txt1.String = num2str(speed);
      txt2.String = num2str(score);
-     for n = 1:size(Points,1)
-        V     = Square(Points(n,:));
-        Parts{n}.Vertices = V;
-        Parts{n}.FaceColor = c;
+     for n = 1:numel(Parts)
+         delete(Parts{n})
+         Parts{n} = image('CData',img,'XData',[-0.5 0.5] + XY(1, n),...
+                               'YData',[-0.5 0.5] + XY(2, n));
      end
 else
     text(2.5, 23, 'Speed',...
@@ -49,10 +44,10 @@ else
     text(2.5, 9, 'Next',...
              'HorizontalAlignment','Center','FontSize',12, 'FontWeight','bold','interpreter', 'latex');
     Parts = {};
-    for n = 1:size(Points,1)
-        V     = Square(Points(n,:));
-        Parts = [Parts, {patch(V(:,1),V(:,2),c)}];
-        
+    for n = 1:size(Points,2)
+        sq = image('CData',img,'XData',[-0.5 0.5] + XY(1, n),...
+                               'YData',[-0.5 0.5] + XY(2, n));
+        Parts = [Parts, {sq}];
     end
 end
 drawnow;

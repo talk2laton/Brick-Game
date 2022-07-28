@@ -1,4 +1,4 @@
-function Parts = Shape(point, type, c, flp)
+function Parts = Shape(type, clr, flp)
 Shift  = [1, 0, 1, 0, 1, 0, 1, 0, 1, 0
           2, 0, 2, 0, 2, 0, 2, 0, 2, 0
           2,-1, 3, 0, 3, 0, 2,-1, 1,-1
@@ -14,21 +14,19 @@ switch type
    case 'T'
        index = [7,8]; 
 end
+point = [5;25];
+M = eye(2);
 if(flp)
     M = [-1,0
-         0, 1];
-    Points = ones(4,1)*(point + [4, -2]);
-    Points = Points - Shift(:,index)*M;
-else
-    Points = ones(4,1)*point;
-    Points = Points + Shift(:,index);
+         0, 1]; 
 end
-p   = floor(sum(Points)/4);
-del = p - [5,25];
-Points = Points - ones(4,1)*del;
+Points = point*ones(1,4) + M * Shift(:,index)';
+del = point - mean(Points, 2);
+XY = floor(Points + del*ones(1,4));
+img = flipud(imread(clr));
 Parts = {};
-for n = 1:size(Points,1)
-    V     = Square(Points(n,:));
-    Parts = [Parts, {patch(V(:,1),V(:,2),c)}];
-    drawnow;
+for n = 1:size(Points,2)
+    sq = image('CData',img,'XData',[-0.5 0.5] + XY(1, n),...
+                           'YData',[-0.5 0.5] + XY(2, n));
+    Parts = [Parts, {sq}];
 end

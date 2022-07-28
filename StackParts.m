@@ -2,14 +2,15 @@ function clearedlines = StackParts(Parts)
 global hstack PartStack
 clearedlines = 0; maxY = max(hstack);
 for n = 1:numel(Parts)
-    point = ceil(sum(Parts{n}.Vertices(1:4,:))/4);
+    part = Parts{n};
+    point = [mean(part.XData), mean(part.YData)];
     maxY = max(maxY,point(2));
     hstack(point(1)) = max(hstack(point(1)), point(2));
     if(point(2)<=25)
         if(~isempty(PartStack{point(2),point(1)}))
             error('overlap');
         else
-            PartStack{point(2),point(1)} = Parts{n};
+            PartStack{point(2),point(1)} = part;
         end
     end
 end
@@ -58,7 +59,7 @@ function movepartdown(ny, nx)
 global PartStack
 part = PartStack{ny,nx};
 if ishandle(part)
-    part.Vertices(:,2) = part.Vertices(:,2) - 1;
+    part.YData = part.YData - 1;
     PartStack{ny-1,nx} = part;
     PartStack{ny,nx} = [];
 else

@@ -5,13 +5,13 @@ try
         case 'control'
            pause;
         case 'rightarrow'
-           Moveshape(Parts,[1,0]);
+           Moveshape(Parts,[1;0]);
        case 'leftarrow'
-           Moveshape(Parts,[-1,0]);
+           Moveshape(Parts,[-1;0]);
        case 'uparrow'
            Rotateshape(Parts);
        case 'downarrow'
-           Moveshape(Parts,[0,-1]);
+           Moveshape(Parts,[0;-1]);
     end
     drawnow;
 catch

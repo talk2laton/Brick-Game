@@ -1,4 +1,4 @@
-function moved = Moveshape(Parts, del)
+function moved = Moveshape2(Parts, del)
 global PartStack
 XY = zeros(2, numel(Parts));
 for n = 1:numel(Parts)
@@ -15,8 +15,8 @@ if(any(XY(2,:) < 1))
 end
 %% Check collision with others
 for n = 1:numel(Parts)
-    i = XY(2, n); j = XY(1, n);
-    if(~isempty(PartStack{i, j}))
+    i = XY(2, n)
+    if(ishandle(PartStack(XY(2, n), XY(1, n)))
         return;
     end
 end
